@@ -65,6 +65,12 @@ body {
   background: #0f57b5;
 }
 
+
+.hint-text {
+  margin: 0.2rem 0 0;
+  color: #6b7787;
+  font-size: 0.86rem;
+}
 #status {
   margin: 0.9rem 0 0;
   color: #526170;

@@ -24,10 +24,13 @@
             name="query"
             type="text"
             placeholder="Search suburb or postcode (e.g. 2000, Fitzroy)"
+            list="postcode-suggestions"
             required
           />
+          <datalist id="postcode-suggestions"></datalist>
           <button type="submit">Search</button>
         </form>
+        <p class="hint-text">Tip: start typing a postcode to see suburb suggestions.</p>
         <p id="status" role="status" aria-live="polite">Enter a suburb or postcode to begin.</p>
       </aside>
 
