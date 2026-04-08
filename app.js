@@ -65,7 +65,7 @@ async function geocodeLocation(query) {
 
 async function fetchPostcodeSuggestions(postcodeFragment) {
   const url = new URL('https://nominatim.openstreetmap.org/search');
-  url.searchParams.set('postalcode', postcodeFragment);
+  url.searchParams.set('q', postcodeFragment);
   url.searchParams.set('format', 'jsonv2');
   url.searchParams.set('limit', '8');
   url.searchParams.set('addressdetails', '1');
@@ -101,7 +101,7 @@ queryInput.addEventListener('input', () => {
     try {
       const results = await fetchPostcodeSuggestions(query);
       const seen = new Set();
-      const labels = [];
+      const suggestions = [];
 
       for (const result of results) {
         const label = extractSuggestionLabel(result);
@@ -110,13 +110,15 @@ queryInput.addEventListener('input', () => {
         }
 
         seen.add(label);
-        labels.push(label);
+        const [postcode, suburb] = label.split(' - ');
+        suggestions.push({ postcode, suburb: suburb || '' });
       }
 
       suggestionsList.innerHTML = '';
-      for (const label of labels) {
+      for (const suggestion of suggestions) {
         const option = document.createElement('option');
-        option.value = label;
+        option.value = suggestion.postcode;
+        option.label = suggestion.suburb ? `${suggestion.postcode} - ${suggestion.suburb}` : suggestion.postcode;
         suggestionsList.appendChild(option);
       }
     } catch (error) {
