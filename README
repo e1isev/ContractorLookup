@@ -1,199 +1,22 @@
-# Contractor Lookup Map Plan
+# Suburb/Postcode Finder
 
-## Goal
-Build a web-based lookup map powered by a spreadsheet of contractors where a user can search any location and immediately see:
-- The **3 nearest contractors** in a left-side results panel.
-- Those contractors plotted on the map.
-- Each contractor's service **radius** drawn on the map.
-- The searched location marker shown on the map.
+A lightweight web page with a search bar that finds a suburb or postcode and places it on an interactive map.
 
----
+## Features
+- Search bar for suburb or postcode.
+- Map display using Leaflet + OpenStreetMap tiles.
+- Geocoding via Nominatim.
+- Marker and popup for the located search result.
 
-## 1) Data Design (Spreadsheet-Driven)
+## Run locally
+Because this app uses browser JavaScript and external APIs, run it from a local web server:
 
-Use a Google Sheet (or CSV export) with one row per contractor.
-
-### Required columns
-- `contractor_id` (unique)
-- `contractor_name`
-- `address`
-- `city`
-- `state`
-- `zip`
-- `latitude`
-- `longitude`
-- `service_radius_miles`
-- `phone`
-- `email`
-- `website`
-- `active` (TRUE/FALSE)
-
-### Optional columns
-- `specialties`
-- `rating`
-- `notes`
-
-### Validation rules
-- `latitude` and `longitude` must be numeric.
-- `service_radius_miles` must be numeric and > 0.
-- No duplicate `contractor_id`.
-- Ignore rows with `active = FALSE`.
-
----
-
-## 2) System Architecture
-
-### Data source layer
-- Pull contractor data from spreadsheet API (Google Sheets API) or scheduled CSV fetch.
-- Cache normalized data in backend memory/database for fast lookup.
-- Refresh on interval (example: every 15 minutes).
-
-### Backend service
-Expose APIs:
-- `GET /contractors` (all active contractors)
-- `POST /search` with `{ query: "<address or zip>" }`
-  - Geocode query to lat/lng.
-  - Compute distance from search point to each contractor.
-  - Return sorted results and top 3 nearest.
-
-### Frontend map app
-- Search input at top.
-- Left panel for top 3 nearest contractors.
-- Main map with:
-  - Search point marker.
-  - Contractor markers.
-  - Radius circles for returned contractors.
-- Click marker/list item to open detail card.
-
----
-
-## 3) Distance + Ranking Logic
-
-1. Geocode user search to `(searchLat, searchLng)`.
-2. For each contractor row:
-   - Calculate great-circle distance (Haversine).
-   - `within_radius = distance_miles <= service_radius_miles`.
-3. Sort by `distance_miles` ascending.
-4. Select nearest 3 contractors (regardless of radius), but visually tag if outside their service radius.
-5. Return payload fields:
-   - contractor info
-   - `distance_miles`
-   - `within_radius`
-   - `service_radius_miles`
-
----
-
-## 4) Map + UI Behavior
-
-### On search submit
-- Center map on search point.
-- Add a distinct “searched location” marker.
-- Plot nearest contractors:
-  - Marker for each contractor.
-  - Circle radius in miles converted to meters.
-- Auto-fit map bounds to include search point + contractor circles.
-
-### Left panel (top 3)
-Each card should show:
-- Contractor name
-- Distance from searched location
-- Service radius
-- In-range badge (`Inside Radius` / `Outside Radius`)
-- Contact CTA (call/email/website)
-
-### Interaction
-- Hover/click list card highlights map marker and radius.
-- Click marker highlights corresponding list card.
-
----
-
-## 5) Implementation Tasks
-
-### Task A — Spreadsheet integration
-- Configure sheet schema and validation.
-- Build fetch + normalization service.
-- Add refresh job and basic error handling.
-
-### Task B — Search/geocoding endpoint
-- Integrate geocoding provider (Google Maps Geocoding or Mapbox).
-- Implement `/search` endpoint.
-- Add Haversine calculation and ranking.
-
-### Task C — Map rendering
-- Implement map with provider (Google Maps JS / Mapbox GL / Leaflet).
-- Add search marker, contractor markers, and radius circles.
-- Fit bounds logic.
-
-### Task D — Left panel results UI
-- Build top-3 list cards and selected/highlight states.
-- Wire click/hover synchronization with map layers.
-
-### Task E — Quality + operations
-- Add logging and request tracing.
-- Add rate-limit handling for geocoder.
-- Add data refresh monitoring and fallback behavior.
-
----
-
-## 6) Recommended Tech Stack
-
-- **Frontend**: React + TypeScript
-- **Map**: Mapbox GL JS (or Leaflet for lower cost)
-- **Backend**: Node.js (Express/Fastify)
-- **Data**: Google Sheets API (cached in Redis or memory)
-- **Deployment**: Vercel/Netlify (frontend) + Render/Fly/Cloud Run (backend)
-
----
-
-## 7) API Contract (Example)
-
-### Request
-`POST /search`
-```json
-{
-  "query": "30318"
-}
+```bash
+python3 -m http.server 8080
 ```
 
-### Response
-```json
-{
-  "search_point": {
-    "query": "30318",
-    "latitude": 33.7862,
-    "longitude": -84.4694
-  },
-  "nearest_contractors": [
-    {
-      "contractor_id": "c_102",
-      "contractor_name": "Alpha Roofing",
-      "latitude": 33.79,
-      "longitude": -84.44,
-      "service_radius_miles": 20,
-      "distance_miles": 4.2,
-      "within_radius": true
-    }
-  ]
-}
-```
+Then open: `http://localhost:8080`
 
----
-
-## 8) Acceptance Criteria
-
-1. Given a valid location query, system returns exactly 3 nearest active contractors.
-2. Map displays:
-   - searched location,
-   - 3 contractor markers,
-   - contractor radius circles.
-3. Left panel lists those same 3 contractors in nearest-first order.
-4. Distances are displayed and consistent with backend ranking.
-5. UI remains usable if sheet has missing/invalid rows (invalid rows skipped).
-
----
-
-## 9) Future Enhancements
-- Filter by specialty/service type.
-- “Only show within radius” toggle.
-- ETA/travel-time ranking mode.
-- Admin dashboard for sheet validation errors.
+## Notes
+- Nominatim usage policies apply for production use.
+- The default map starts centered on Australia.
