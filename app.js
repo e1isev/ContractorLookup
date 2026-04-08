@@ -37,6 +37,16 @@ function clearSuggestions() {
   suggestionsList.innerHTML = '';
 }
 
+function openSuggestionDropdown() {
+  if (document.activeElement !== queryInput) {
+    return;
+  }
+
+  if (typeof queryInput.showPicker === 'function') {
+    queryInput.showPicker();
+  }
+}
+
 async function geocodeLocation(query) {
   const url = new URL('https://nominatim.openstreetmap.org/search');
   url.searchParams.set('q', query);
@@ -120,6 +130,10 @@ queryInput.addEventListener('input', () => {
         option.value = suggestion.postcode;
         option.label = suggestion.suburb ? `${suggestion.postcode} - ${suggestion.suburb}` : suggestion.postcode;
         suggestionsList.appendChild(option);
+      }
+
+      if (suggestions.length > 0) {
+        openSuggestionDropdown();
       }
     } catch (error) {
       console.error(error);
