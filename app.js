@@ -21,6 +21,7 @@ async function geocodeLocation(query) {
   url.searchParams.set('format', 'jsonv2');
   url.searchParams.set('limit', '1');
   url.searchParams.set('addressdetails', '1');
+  url.searchParams.set('countrycodes', 'au');
 
   const response = await fetch(url, {
     headers: {
