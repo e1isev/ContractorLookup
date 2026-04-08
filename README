@@ -9,13 +9,46 @@ A lightweight web page with a search bar that finds a suburb or postcode and pla
 - Marker and popup for the located search result.
 
 ## Run locally
-Because this app uses browser JavaScript and external APIs, run it from a local web server:
+Start the app server (uses `PORT`, defaults to `8080`):
 
 ```bash
-python3 -m http.server 8080
+python3 server.py
 ```
 
 Then open: `http://localhost:8080`
+
+## Deploy with Google Cloud Build + Cloud Run
+This repository is now ready for the Cloud Build trigger flow shown in your screenshot.
+
+### 1) Required files in this repo
+- `Dockerfile` at repository root (`/Dockerfile`)
+- `server.py` that listens on `PORT`
+
+### 2) Create (or confirm) Artifact Registry repo
+Example:
+
+```bash
+gcloud artifacts repositories create contractorlookup \
+  --repository-format=docker \
+  --location=us-central1
+```
+
+### 3) Build and deploy once manually (optional first deploy)
+
+```bash
+gcloud run deploy contractorlookup \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated
+```
+
+### 4) Configure Cloud Build trigger (matching your UI)
+- Source repository: this repo
+- Branch regex: `^main$`
+- Build type: **Dockerfile**
+- Source location: `/Dockerfile`
+
+Cloud Build will build container images and deploy to Cloud Run on each push to `main`.
 
 ## Notes
 - Nominatim usage policies apply for production use.
