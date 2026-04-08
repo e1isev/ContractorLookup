@@ -14,8 +14,9 @@
   </head>
   <body>
     <div class="app-shell">
-      <header class="toolbar">
+      <aside class="left-panel" aria-label="Search panel">
         <h1>Suburb or Postcode Map Search</h1>
+        <p class="panel-copy">Search is currently limited to Australian locations.</p>
         <form id="search-form" class="search-form" autocomplete="off">
           <label for="query" class="sr-only">Search suburb or postcode</label>
           <input
@@ -28,7 +29,7 @@
           <button type="submit">Search</button>
         </form>
         <p id="status" role="status" aria-live="polite">Enter a suburb or postcode to begin.</p>
-      </header>
+      </aside>
 
       <main>
         <div id="map" aria-label="Map"></div>

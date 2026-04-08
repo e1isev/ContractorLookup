@@ -16,29 +16,34 @@ body {
 .app-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-columns: minmax(260px, 340px) 1fr;
 }
 
-.toolbar {
+.left-panel {
   background: #fff;
-  border-bottom: 1px solid #d7dfeb;
-  padding: 1rem;
+  border-right: 1px solid #d7dfeb;
+  padding: 1.25rem;
 }
 
-.toolbar h1 {
-  margin: 0 0 0.75rem;
+.left-panel h1 {
+  margin: 0;
   font-size: 1.25rem;
+}
+
+.panel-copy {
+  margin: 0.6rem 0 1rem;
+  color: #526170;
+  font-size: 0.95rem;
 }
 
 .search-form {
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .search-form input {
-  flex: 1;
-  min-width: 16rem;
+  width: 100%;
   border: 1px solid #c3cfdd;
   border-radius: 8px;
   padding: 0.65rem 0.75rem;
@@ -61,7 +66,7 @@ body {
 }
 
 #status {
-  margin: 0.75rem 0 0;
+  margin: 0.9rem 0 0;
   color: #526170;
 }
 
@@ -71,7 +76,7 @@ main {
 
 #map {
   width: 100%;
-  height: calc(100vh - 180px);
+  height: calc(100vh - 2rem);
   min-height: 420px;
   border-radius: 12px;
   border: 1px solid #d7dfeb;
@@ -86,4 +91,20 @@ main {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .left-panel {
+    border-right: 0;
+    border-bottom: 1px solid #d7dfeb;
+  }
+
+  #map {
+    height: calc(100vh - 260px);
+  }
 }
